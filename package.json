@@ -1,0 +1,48 @@
+{
+  "name": "@yourname/buildervillager",
+  "version": "0.1.0",
+  "description": "一条命令检查/部署/更新 Minecraft Paper 26.3 服务端、BuilderVillager MCP 服务与 Agent 技能",
+  "keywords": [
+    "minecraft",
+    "paper",
+    "mcp",
+    "worldedit",
+    "worldguard",
+    "agent",
+    "codex",
+    "deepseek"
+  ],
+  "license": "MIT",
+  "author": "yourname",
+  "bin": {
+    "buildervillager": "bin/buildervillager.js",
+    "bv": "bin/buildervillager.js"
+  },
+  "files": [
+    "bin",
+    "lib",
+    "vendor",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
+  "scripts": {
+    "stage": "node scripts/stage-vendor.js",
+    "prepack": "node scripts/stage-vendor.js",
+    "test": "node test/cli.test.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/rzdfzcl/buildervillager.git"
+  },
+  "bugs": {
+    "url": "https://github.com/rzdfzcl/buildervillager/issues"
+  },
+  "homepage": "https://github.com/rzdfzcl/buildervillager#readme"
+}
