@@ -1,11 +1,45 @@
 # @rzdfzcl/buildervillager
 
+[![npm](https://img.shields.io/npm/v/@rzdfzcl/buildervillager.svg)](https://www.npmjs.com/package/@rzdfzcl/buildervillager)
+[![license](https://img.shields.io/npm/l/@rzdfzcl/buildervillager.svg)](LICENSE)
+[![CI](https://github.com/rzdfzcl/buildervillager/actions/workflows/ci.yml/badge.svg)](https://github.com/rzdfzcl/buildervillager/actions/workflows/ci.yml)
+
 一条命令完成 Minecraft **Paper 26.3** 服务端、**BuilderVillager MCP 服务**与 **Agent 技能**的检查 / 部署 / 更新。
+
+## 安装
+
+任选一种，**效果完全相同**。
+
+### 方式一：直接从 GitHub 安装（无需 npm 账号，立即可用）
+
+```bash
+npm install -g github:rzdfzcl/buildervillager
+buildervillager
+```
+
+固定版本：
+
+```bash
+npm install -g github:rzdfzcl/buildervillager#v0.1.0
+```
+
+`git` 地址安装会从仓库拉取源码；`prepack` 会用仓库里已提交的 `vendor/`（MCP 服务程序 + 技能模板），不需要本地编译。
+
+### 方式二：Release 压缩包
+
+```bash
+npm install -g https://github.com/rzdfzcl/buildervillager/releases/download/v0.1.0/rzdfzcl-buildervillager-0.1.0.tgz
+```
+
+### 方式三：npm 官方源
 
 ```bash
 npm install -g @rzdfzcl/buildervillager
-buildervillager
 ```
+
+> 若镜像源尚未同步，加 `--registry=https://registry.npmjs.org/`。
+
+安装完成后 `buildervillager`、`bv` 两个命令都可用。
 
 运行后进入多选菜单（方向键移动、**空格勾选**、`a` 全选、回车确认），工具随后依次：
 
@@ -96,12 +130,36 @@ buildervillager-server\mcp\start.cmd
 ```bash
 git clone https://github.com/rzdfzcl/buildervillager.git
 cd buildervillager
-npm install
 npm test             # 离线测试，不访问网络
 npm pack --dry-run   # 查看将发布的文件
 ```
 
-`prepack` 会把 MCP 服务程序与技能模板复制到 `vendor/`，因此发布包自带可运行的服务端，无需额外构建。
+`vendor/` 里放的是随包分发的 MCP 服务程序与技能模板，由上游构建产出后提交，因此本仓库可以独立安装与发布：
+
+- 从上游同步：把新的 `buildervillager-mcp.jar` 覆盖到 `vendor/`，技能模板放到 `vendor/skills/<技能名>/SKILL.md`；
+- 执行 `npm pack --dry-run` 确认文件清单，再 `npm publish` 或建立 Release。
+
+### 从 GitHub 安装的原理
+
+`npm install -g github:rzdfzcl/buildervillager` 会克隆仓库、安装依赖并执行 `prepack`。`scripts/stage-vendor.js` 在没有上游构建产物时会保留已提交的 `vendor/`，所以安装不需要任何编译步骤。若希望固定到某个版本，用 `#v0.1.0` 这样的 tag。
+
+### 发布新版本
+
+```bash
+# 1. 更新版本号（两处保持一致）
+#    package.json 的 version
+npm version patch --no-git-tag-version
+
+# 2. 确认内容
+npm pack --dry-run
+
+# 3. npm（需要开启 2FA）
+npm publish --registry=https://registry.npmjs.org/
+
+# 4. Release 压缩包（供无法访问 npm 的用户）
+npm pack
+gh release create v0.1.1 *.tgz --title "v0.1.1" --notes "变更说明"
+```
 
 ## License
 
