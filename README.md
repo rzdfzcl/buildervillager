@@ -1,9 +1,9 @@
-# @yourname/buildervillager
+# @rzdfzcl/buildervillager
 
 一条命令完成 Minecraft **Paper 26.3** 服务端、**BuilderVillager MCP 服务**与 **Agent 技能**的检查 / 部署 / 更新。
 
 ```bash
-npm install -g @yourname/buildervillager
+npm install -g @rzdfzcl/buildervillager
 buildervillager
 ```
 
@@ -82,7 +82,6 @@ buildervillager-server\mcp\start.cmd
 - **Node.js 18+**（本工具自身）
 - **JDK 25**（Paper 26.3 与 MCP 服务；`--java-home` 可指定）
 - 已安装并登录 **Codex** 或 **DeepSeek Harness** CLI（服务端 Agent 使用其运行账户已有的配置与登录）
-- 首次下载需要访问 PaperMC 与 Modrinth
 
 ## 边界
 
@@ -91,21 +90,18 @@ buildervillager-server\mcp\start.cmd
 - `eula.txt` 默认写 `false`，不会替你同意 Mojang 协议。
 - 技能只增删自己的两个目录，不改动其他技能与 CLI 全局配置。
 - 所有下载都做哈希校验，不一致立即丢弃并报错。
-- 不调用真实模型；部署完成后仍需在游戏内手动绑定与测试。
 
 ## 开发
 
 ```bash
 git clone https://github.com/rzdfzcl/buildervillager.git
 cd buildervillager
+npm install
 npm test             # 离线测试，不访问网络
 npm pack --dry-run   # 查看将发布的文件
 ```
 
-`vendor/` 里放的是随包分发的 MCP 服务程序与技能模板，由上游构建产出后提交，因此本仓库可以独立发布：
-
-- 从上游同步：把新的 `buildervillager-mcp.jar` 覆盖到 `vendor/`，技能模板放到 `vendor/skills/<技能名>/SKILL.md`；
-- 执行 `npm pack --dry-run` 确认文件清单，再 `npm publish`。
+`prepack` 会把 MCP 服务程序与技能模板复制到 `vendor/`，因此发布包自带可运行的服务端，无需额外构建。
 
 ## License
 
