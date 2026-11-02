@@ -52,7 +52,9 @@ try {
     if (!(Test-Path -LiteralPath $ready)) {
       Write-Host 'Extracting complete installation package...'
       New-Item -ItemType Directory -Force -Path $cache | Out-Null
-      & (Join-Path $env:SystemRoot 'System32/tar.exe') -xf $archive -C $cache
+      Push-Location -LiteralPath $base
+      try { & (Join-Path $env:SystemRoot 'System32/tar.exe') -xf ([IO.Path]::GetFileName($archive)) -C (Join-Path '.buildervillager-installer' $version) }
+      finally { Pop-Location }
       if ($LASTEXITCODE -ne 0 -or !(Test-Path -LiteralPath $entry)) { throw 'Package extraction failed.' }
       Set-Content -LiteralPath $ready -Value $version -Encoding ASCII
     }
