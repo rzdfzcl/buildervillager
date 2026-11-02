@@ -4,3 +4,9 @@ node_modules/
 Thumbs.db
 npm-debug.log*
 *.log
+
+.stage/
+vendor/downloads/
+buildervillager-server/
+*.download
+*.tmp

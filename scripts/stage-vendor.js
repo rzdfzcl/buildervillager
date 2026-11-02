@@ -10,6 +10,11 @@
  */
 const fs = require('node:fs');
 const path = require('node:path');
+const { resolvePaper, resolveModrinth } = require('../lib/resolve');
+const { resolveJdk, resolveAgent } = require('../lib/runtime');
+const { materialize } = require('../lib/bundle');
+const { hashFileSync, readJson, writeAtomic } = require('../lib/util');
+const { stageDeepSeek } = require('./stage-deepseek');
 
 const npmRoot = path.join(__dirname, '..');
 const vendor = path.join(npmRoot, 'vendor');
@@ -28,13 +33,13 @@ function readVersion() {
   return JSON.parse(fs.readFileSync(candidates[1], 'utf8')).version;
 }
 
-function findJar(version) {
-  const directory = path.join(monorepoRoot, 'mcp', 'build', 'libs');
+function findJar(version, module = 'mcp') {
+  const directory = path.join(monorepoRoot, module, 'build', 'libs');
   if (!fs.existsSync(directory)) return '';
-  const exact = path.join(directory, `buildervillager-mcp-${version}.jar`);
+  const exact = path.join(directory, `buildervillager-${module}-${version}.jar`);
   if (fs.existsSync(exact)) return exact;
   const match = fs.readdirSync(directory)
-    .filter((name) => /^buildervillager-mcp-.*\.jar$/.test(name))
+    .filter((name) => new RegExp(`^buildervillager-${module}-.*\\.jar$`).test(name))
     .sort((a, b) => fs.statSync(path.join(directory, b)).mtimeMs - fs.statSync(path.join(directory, a)).mtimeMs)[0];
   return match ? path.join(directory, match) : '';
 }
@@ -56,10 +61,11 @@ function copySkills() {
   return count;
 }
 
-function main() {
+async function main() {
   const version = readVersion();
   const jar = findJar(version);
   fs.mkdirSync(vendor, { recursive: true });
+  writeAtomic(path.join(vendor, '.npmignore'), '*.download\n*.tmp\n');
 
   if (jar) {
     fs.copyFileSync(jar, path.join(vendor, 'buildervillager-mcp.jar'));
@@ -85,7 +91,44 @@ function main() {
   const skillDirs = fs.existsSync(path.join(vendor, 'skills'))
     ? fs.readdirSync(path.join(vendor, 'skills')).filter((name) => fs.existsSync(path.join(vendor, 'skills', name, 'SKILL.md')))
     : [];
-  console.log(`vendor 就绪：1 个服务程序，${skillDirs.length} 个技能`);
+  for (const name of ['buildervillager-construction', 'buildervillager-knowledge-curation']) {
+    if (!skillDirs.includes(name)) throw new Error(`缺少必需技能 ${name}，拒绝打包`);
+  }
+  const plugin = findJar(version, 'paper');
+  const pluginTarget = path.join(vendor, 'buildervillager-paper.jar');
+  if (plugin) fs.copyFileSync(plugin, pluginTarget);
+  if (!fs.existsSync(pluginTarget)) throw new Error('缺少 BuilderVillager Paper 插件，先构建 :paper:jar');
+
+  // Ship a complete Windows x64 installation. Other platforms resolve their native archives on demand.
+  const minecraft = require('../lib/cli').DEFAULTS.minecraft;
+  const manifestPath = path.join(vendor, 'manifest.json');
+  const manifest = readJson(manifestPath, { artifacts: {} });
+  const definitions = {
+    paper: () => resolvePaper(minecraft),
+    worldedit: () => resolveModrinth('worldedit', minecraft),
+    worldguard: () => resolveModrinth('worldguard', minecraft),
+    jdk: () => resolveJdk('win32', 'x64'),
+    agent: () => resolveAgent('win32', 'x64'),
+    deepseek: () => stageDeepSeek(vendor),
+  };
+  const results = await Promise.allSettled(Object.entries(definitions).map(async ([key, resolve]) => {
+    let artifact = manifest.artifacts[key];
+    const valid = artifact && (!artifact.minecraft || artifact.minecraft === minecraft)
+      && await hashFileSync(path.join(vendor, artifact.file), artifact.algorithm) === artifact.checksum;
+    if (!valid || process.argv.includes('--refresh')) {
+      artifact = await resolve();
+      const file = `downloads/${artifact.name}`;
+      console.log(`  打包 ${key}: ${artifact.name}`);
+      if (key !== 'deepseek') await materialize(artifact, path.join(vendor, file));
+      artifact.file = file;
+      if (['paper', 'worldedit', 'worldguard'].includes(key)) artifact.minecraft = minecraft;
+      manifest.artifacts[key] = artifact;
+      writeAtomic(manifestPath, `${JSON.stringify(manifest, null, 2)}\n`);
+    }
+    console.log(`  ${key} 校验通过`);
+  }));
+  for (const result of results) if (result.status === 'rejected') throw result.reason;
+  console.log(`vendor 就绪：MCP、Paper 插件、${skillDirs.length} 个技能、JDK、Paper、WorldEdit、WorldGuard、Codex CLI、DeepSeek Harness（含依赖）`);
 }
 
-main();
+main().catch((error) => { console.error(error.message); process.exitCode = 1; });

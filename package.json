@@ -1,6 +1,6 @@
 {
   "name": "@rzdfzcl/buildervillager",
-  "version": "0.1.0",
+  "version": "0.1.4",
   "description": "一条命令检查/部署/更新 Minecraft Paper 26.3 服务端、BuilderVillager MCP 服务与 Agent 技能",
   "keywords": [
     "minecraft",
@@ -22,11 +22,13 @@
     "bin",
     "lib",
     "vendor",
+    "panel",
+    "install.cmd",
     "README.md",
     "LICENSE"
   ],
   "engines": {
-    "node": ">=18"
+    "node": ">=22.16"
   },
   "publishConfig": {
     "access": "public",
@@ -35,7 +37,7 @@
   "scripts": {
     "stage": "node scripts/stage-vendor.js",
     "prepack": "node scripts/stage-vendor.js",
-    "test": "node test/cli.test.js"
+    "test": "node --test test/*.test.js"
   },
   "repository": {
     "type": "git",

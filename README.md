@@ -1,65 +1,54 @@
 # @rzdfzcl/buildervillager
 
-[![npm](https://img.shields.io/npm/v/@rzdfzcl/buildervillager.svg)](https://www.npmjs.com/package/@rzdfzcl/buildervillager)
-[![license](https://img.shields.io/npm/l/@rzdfzcl/buildervillager.svg)](LICENSE)
-[![CI](https://github.com/rzdfzcl/buildervillager/actions/workflows/ci.yml/badge.svg)](https://github.com/rzdfzcl/buildervillager/actions/workflows/ci.yml)
-
 一条命令完成 Minecraft **Paper 26.3** 服务端、**BuilderVillager MCP 服务**与 **Agent 技能**的检查 / 部署 / 更新。
 
-## 安装
-
-任选一种，**效果完全相同**。
-
-### 方式一：直接从 GitHub 安装（无需 npm 账号，立即可用）
+一键下载并运行（在希望存放服务端的目录执行）：
 
 ```bash
-npm install -g github:rzdfzcl/buildervillager
-buildervillager
+npx --yes @rzdfzcl/buildervillager@latest
 ```
 
-固定版本：
+命令下载完成后**立即自动安装全部组件**，不再要求输入第二条命令或确认组件菜单。默认部署到当前目录下的 `buildervillager-server/`；需要自己选择组件时加 `--interactive`。
 
-```bash
-npm install -g github:rzdfzcl/buildervillager#v0.1.0
-```
+Windows 本地发行包：把 `install.cmd` 和 `rzdfzcl-buildervillager-0.1.4.tgz` 放在同一个目录，**双击 `install.cmd`**。脚本会自动解包并执行安装，无需输入 `-- buildervillager`。完整解压后的 npm 包同样可以直接双击其中的 `install.cmd`。
 
-`git` 地址安装会从仓库拉取源码；`prepack` 会用仓库里已提交的 `vendor/`（MCP 服务程序 + 技能模板），不需要本地编译。
+也可以从 [GitHub Releases](https://github.com/rzdfzcl/buildervillager/releases) 只下载 `install.cmd` 并双击：没有本地包时自动下载完整安装包；npm 暂不可用时改从对应 GitHub Release 下载，并校验 `SHA256SUMS.txt`。
 
-### 方式二：Release 压缩包
+如果已经运行过 `npm install -g @rzdfzcl/buildervillager`，直接执行 `buildervillager` 即可继续部署。`npm install -g` 只安装命令行工具，不会运行部署流程。
 
-```bash
-npm install -g https://github.com/rzdfzcl/buildervillager/releases/download/v0.1.0/rzdfzcl-buildervillager-0.1.0.tgz
-```
-
-### 方式三：npm 官方源
+也可以选择全局安装，之后重复使用：
 
 ```bash
 npm install -g @rzdfzcl/buildervillager
+buildervillager
 ```
 
-> 若镜像源尚未同步，加 `--registry=https://registry.npmjs.org/`。
+运行后自动依次：
 
-安装完成后 `buildervillager`、`bv` 两个命令都可用。
-
-运行后进入多选菜单（方向键移动、**空格勾选**、`a` 全选、回车确认），工具随后依次：
-
-1. **检查** —— 对比本地现状与官方最新版本，打印差异表；有阻塞问题时直接退出，不改任何文件；
-2. **部署** —— 下载并校验 Paper、WorldEdit、WorldGuard，写入 MCP 服务、配置、共享密钥与启动脚本；
+1. **检查** —— 对比本地现状与随包版本，打印差异表；缺少 Java 或 Agent CLI 会计划自动安装；
+2. **部署** —— 校验并释放 JDK、Paper、WorldEdit、WorldGuard、BuilderVillager 插件、MCP 服务、配置、共享密钥与启动脚本；
 3. **更新** —— 已有内容按需升级；已有配置与共享密钥默认保留，避免两端密钥漂移。
 
 ## 组件（可多选）
 
 | 组件 | 内容 | 来源 |
 | --- | --- | --- |
-| `paper` | Paper 26.3 服务端，最新 STABLE 构建 | PaperMC v3 API，SHA256 校验 |
-| `plugins` | WorldEdit、WorldGuard | Modrinth，SHA512 校验 |
+| `paper` | Paper 26.3 服务端，打包时最新 STABLE 构建 | 随包分发；PaperMC v3 API，SHA256 校验 |
+| `plugins` | WorldEdit、WorldGuard、BuilderVillager Paper 插件 | 随包分发；前两者来自 Modrinth，SHA512 校验 |
 | `mcp` | BuilderVillager MCP 服务 + `mcp.json` + 共享密钥 + Paper 侧配置 + 启动脚本 | 随本包分发（`vendor/`） |
 | `skills` | `buildervillager-construction`、`buildervillager-knowledge-curation` | 随本包分发（`vendor/skills/`） |
+
+Windows x64 发布包包含上述全部资源，以及 **JDK 25 ZIP**、**Codex 原生 CLI 安装包**、**DeepSeek Harness 及完整 npm 依赖包**。未配置 `JAVA_HOME`、PATH 中没有 Java、已有 Java 低于 25 时，会自动释放 JDK 到服务目录 `runtime/java/`，无需管理员权限；Paper 和 MCP 启动脚本直接引用它。优先复用已安装的可用 Java、DeepSeek 或 Codex；没有 Agent CLI 时，默认把随包 Harness 安装到 `runtime/deepseek/`，并启用服务端 Agent。指定 `--backend codex` 时自动安装随包 Codex 到 `runtime/agent/`。
+
+Harness 包包含 npm 的完整依赖树，不会只复制 `dsh` 入口；部署时同时复制当前 Node 到其目录，启动脚本不依赖 PATH。其他系统/架构没有对应随包 Harness 时通过 npm 自动补齐；JDK 和 Codex、以及 `--minecraft` 指定的其他版本从官方来源自动补齐。下载、校验或解压失败会报告具体错误，可直接重跑；缺少依赖本身不会阻塞安装。
+
+默认版本的 Windows x64 部署在 npx 下载完成后无需再次下载上述组件；Paper 首次启动仍可能下载其运行库。更新随包组件时重新运行 `npx --yes @rzdfzcl/buildervillager@latest`。
 
 ## 命令
 
 ```bash
-buildervillager                 # 交互多选 → 检查 → 部署/更新
+buildervillager                 # 自动检查 → 安装全部组件
+buildervillager --interactive   # 按需显示组件选择菜单
 buildervillager check           # 只看差异，不改动
 buildervillager update          # 升级后重跑即可（幂等）
 buildervillager doctor          # 部署后自检：Java、文件、密钥一致性、CLI、技能
@@ -76,7 +65,7 @@ buildervillager skills          # 只安装 Agent 技能
 | `--skip <组件,...>` | 跳过指定组件 |
 | `--backend codex\|deepseek` | Agent 后端，默认按 `PATH` 探测（优先 `dsh`） |
 | `--executable <路径>` | 指定 CLI 完整路径 |
-| `--java-home <路径>` | JDK 25 目录，默认 `$JAVA_HOME` 或 `PATH` |
+| `--java-home <路径>` | 优先使用指定 JDK，或探测 `$JAVA_HOME` / `PATH`；不足 Java 25 时自动安装 |
 | `--port` / `--bridge-port` | 公开 MCP 端口 / Paper 内部端口，默认 25576 / 25577 |
 | `--concurrency <1-4>` | 并行 Agent 任务数，默认 2 |
 | `--eula` | 写入 `eula=true`（表示你同意 Mojang EULA） |
@@ -88,11 +77,16 @@ buildervillager skills          # 只安装 Agent 技能
 
 ```text
 buildervillager-server/
+  runtime/java/                       # 缺少 Java 25 时自动安装的本地 JDK
+  runtime/deepseek/                   # 缺少 Agent CLI 时自动安装的 Harness + 依赖
+  runtime/agent/                      # 选用 Codex 时自动安装
   paper-26.3-<构建>.jar
+  start.cmd  start.ps1                # 一键启动 Paper + MCP
   start-paper.cmd                     # 已从 mcp/secret.txt 注入共享密钥
   server.properties  eula.txt
   plugins/worldedit-bukkit-*.jar
   plugins/worldguard-bukkit-*.jar
+  plugins/buildervillager-paper.jar
   plugins/BuilderVillager/mcp.json    # Paper 侧 MCP 配置
   mcp/buildervillager-mcp.jar
   mcp/mcp.json  secret.txt  start.cmd  start.ps1  paper-mcp.json
@@ -102,20 +96,21 @@ buildervillager-server/
 
 ## 启动
 
-先启动 Paper，再另开一个窗口启动 MCP：
+**双击服务目录的 `panel.cmd` 打开管理面板**，点击“启动全部”即可在后台启动 Paper 和 MCP，不弹服务控制台。面板显示每个服务的状态、PID、内存和端口，支持正常停止、查看日志，以及编辑游戏和 MCP/Agent 配置。配置修改会自动备份，并同步相关端口；需要重启对应服务后生效。
+
+面板首次启动服务时会在面板内确认 Minecraft EULA，已经同意后不再询问。也可使用 `start.cmd` 后台启动两个服务；未同意 EULA 时该脚本会询问一次。
 
 ```bash
-buildervillager-server\start-paper.cmd
-buildervillager-server\mcp\start.cmd
+buildervillager-server\start.cmd
 ```
 
 然后进入游戏：`模组 → AI Builder Villager → 配置 → 建筑 MCP → 绑定当前玩家 → 测试 MCP`。
 
 ## 环境要求
 
-- **Node.js 18+**（本工具自身）
-- **JDK 25**（Paper 26.3 与 MCP 服务；`--java-home` 可指定）
-- 已安装并登录 **Codex** 或 **DeepSeek Harness** CLI（服务端 Agent 使用其运行账户已有的配置与登录）
+- **Node.js 22.16+**（本工具与 Harness）
+- **JDK 25** 自动补齐，也可用 `--java-home` 指定。
+- **Codex** / **DeepSeek Harness** CLI 自动补齐；账户登录需要用户完成，已有 CLI 则复用该账户配置与登录。
 
 ## 边界
 
@@ -130,36 +125,12 @@ buildervillager-server\mcp\start.cmd
 ```bash
 git clone https://github.com/rzdfzcl/buildervillager.git
 cd buildervillager
+npm install
 npm test             # 离线测试，不访问网络
 npm pack --dry-run   # 查看将发布的文件
 ```
 
-`vendor/` 里放的是随包分发的 MCP 服务程序与技能模板，由上游构建产出后提交，因此本仓库可以独立安装与发布：
-
-- 从上游同步：把新的 `buildervillager-mcp.jar` 覆盖到 `vendor/`，技能模板放到 `vendor/skills/<技能名>/SKILL.md`；
-- 执行 `npm pack --dry-run` 确认文件清单，再 `npm publish` 或建立 Release。
-
-### 从 GitHub 安装的原理
-
-`npm install -g github:rzdfzcl/buildervillager` 会克隆仓库、安装依赖并执行 `prepack`。`scripts/stage-vendor.js` 在没有上游构建产物时会保留已提交的 `vendor/`，所以安装不需要任何编译步骤。若希望固定到某个版本，用 `#v0.1.0` 这样的 tag。
-
-### 发布新版本
-
-```bash
-# 1. 更新版本号（两处保持一致）
-#    package.json 的 version
-npm version patch --no-git-tag-version
-
-# 2. 确认内容
-npm pack --dry-run
-
-# 3. npm（需要开启 2FA）
-npm publish --registry=https://registry.npmjs.org/
-
-# 4. Release 压缩包（供无法访问 npm 的用户）
-npm pack
-gh release create v0.1.1 *.tgz --title "v0.1.1" --notes "变更说明"
-```
+发布前先构建 `:mcp:jar` 与 `:paper:jar`。Windows x64 环境下 `prepack` 复制这两个程序与技能，从官方来源下载 JDK、Paper、WorldEdit、WorldGuard、Codex，并安装、打包 Harness 的完整 npm 依赖树，写入 `vendor/manifest.json`（来源、版本、哈希），缺少任何必需资源都会拒绝打包。已有资源校验通过时复用，`node scripts/stage-vendor.js --refresh` 刷新为官方最新版本。最终 npm 包自带完整部署资源，用户无需构建 Java 项目。
 
 ## License
 

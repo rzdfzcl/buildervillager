@@ -1,0 +1,75 @@
+{
+  "artifacts": {
+    "paper": {
+      "kind": "paper",
+      "name": "paper-26.3-237.jar",
+      "version": "26.3",
+      "build": 237,
+      "channel": "STABLE",
+      "url": "https://fill-data.papermc.io/v1/objects/57d8774be83dbe2be6a814e945f26a6b82339af9b1c82b768bbfdf4c23fda56e/paper-26.3-237.jar",
+      "size": 55268778,
+      "algorithm": "sha256",
+      "checksum": "57d8774be83dbe2be6a814e945f26a6b82339af9b1c82b768bbfdf4c23fda56e",
+      "file": "downloads/paper-26.3-237.jar",
+      "minecraft": "26.3"
+    },
+    "worldedit": {
+      "kind": "plugin",
+      "slug": "worldedit",
+      "name": "worldedit-bukkit-7.4.6.jar",
+      "version": "7.4.6",
+      "url": "https://cdn.modrinth.com/data/1u6JkXh5/versions/YFnqiUlL/worldedit-bukkit-7.4.6.jar",
+      "size": 7870216,
+      "algorithm": "sha512",
+      "checksum": "1fe3975132857093f971fed9efc601299bfa76fa7885f52a542fee41e7a0165ca9cb3cbcf5ae244474887d774d650b0db6f8f79aa80f98b245dea44f1c1b4152",
+      "file": "downloads/worldedit-bukkit-7.4.6.jar",
+      "minecraft": "26.3"
+    },
+    "worldguard": {
+      "kind": "plugin",
+      "slug": "worldguard",
+      "name": "worldguard-bukkit-7.0.20.jar",
+      "version": "7.0.20",
+      "url": "https://cdn.modrinth.com/data/DKY9btbd/versions/9YdeGXiK/worldguard-bukkit-7.0.20.jar",
+      "size": 1200197,
+      "algorithm": "sha512",
+      "checksum": "d7ad3f8b14c57deceb409dc8997fe3d7f0a98dd4158c52648111bfbe6934ca9be53fa42ece4d60d9c2d9da33f7d6ecf597117991bd3b8e7afbf308cd925e409c",
+      "file": "downloads/worldguard-bukkit-7.0.20.jar",
+      "minecraft": "26.3"
+    },
+    "agent": {
+      "kind": "agent",
+      "platform": "win32",
+      "arch": "x64",
+      "name": "codex-0.166.0-win32-x64.tgz",
+      "url": "https://registry.npmjs.org/@openai/codex/-/codex-0.166.0-win32-x64.tgz",
+      "version": "0.166.0",
+      "algorithm": "sha512",
+      "checksum": "352f0fb39a06e6bd7da42acc0945f052a3ae8baa1d9d4228065424ae3089fa1d64e8a8b00b30bffa623d7779d2642a85a1538d3c14e6ab2abc358ab761a146c8",
+      "file": "downloads/codex-0.166.0-win32-x64.tgz"
+    },
+    "jdk": {
+      "kind": "jdk",
+      "platform": "win32",
+      "arch": "x64",
+      "name": "microsoft-jdk-25-windows-x64.zip",
+      "url": "https://aka.ms/download-jdk/microsoft-jdk-25-windows-x64.zip",
+      "algorithm": "sha256",
+      "checksum": "5da7525c8268a10a66bd76a39f4e9af24d4ebc974d42800a609852c498a68460",
+      "file": "downloads/microsoft-jdk-25-windows-x64.zip"
+    },
+    "deepseek": {
+      "kind": "deepseek",
+      "format": 2,
+      "platform": "win32",
+      "arch": "x64",
+      "name": "buildervillager-deepseek-runtime-0.2.1-rc.5.tgz",
+      "version": "0.2.1-rc.5",
+      "file": "downloads/buildervillager-deepseek-runtime-0.2.1-rc.5.tgz",
+      "algorithm": "sha256",
+      "checksum": "cdac69e82e5a85b700912cc6e52051969cec15eb1b86cd2a22d7e7cb456c08da",
+      "url": "https://registry.npmjs.org/@deepseek-ai/dsh",
+      "size": 179170714
+    }
+  }
+}

@@ -1,0 +1,66 @@
+<Window xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" Title="BuilderVillager · 服务管理" Width="1160" Height="830" MinWidth="980" MinHeight="720" WindowStartupLocation="CenterScreen" Background="#10151D" Foreground="#E8EDF5" FontFamily="Microsoft YaHei UI" FontSize="13">
+ <Window.Resources>
+  <SolidColorBrush x:Key="Card" Color="#1B2431"/>
+  <Style TargetType="Button"><Setter Property="Background" Value="#29374A"/><Setter Property="Foreground" Value="#F3F7FC"/><Setter Property="Padding" Value="16,9"/><Setter Property="Margin" Value="0,0,8,0"/><Setter Property="BorderThickness" Value="0"/><Setter Property="Cursor" Value="Hand"/><Setter Property="Template"><Setter.Value><ControlTemplate TargetType="Button"><Border Background="{TemplateBinding Background}" CornerRadius="6" Padding="{TemplateBinding Padding}" Opacity="{TemplateBinding Opacity}"><ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/></Border><ControlTemplate.Triggers><Trigger Property="IsMouseOver" Value="True"><Setter Property="Opacity" Value="0.8"/></Trigger><Trigger Property="IsEnabled" Value="False"><Setter Property="Opacity" Value="0.35"/></Trigger></ControlTemplate.Triggers></ControlTemplate></Setter.Value></Setter></Style>
+  <Style TargetType="TextBox"><Setter Property="Background" Value="#101923"/><Setter Property="Foreground" Value="#EDF4FC"/><Setter Property="CaretBrush" Value="#6FE3B7"/><Setter Property="BorderBrush" Value="#354359"/><Setter Property="Padding" Value="10,8"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style>
+  <Style TargetType="ComboBox"><Setter Property="Padding" Value="9,7"/><Setter Property="Foreground" Value="#172332"/><Setter Property="Background" Value="#D7E1ED"/></Style>
+  <Style TargetType="CheckBox"><Setter Property="Foreground" Value="#D4DDEA"/><Setter Property="Margin" Value="0,10,24,10"/><Setter Property="VerticalContentAlignment" Value="Center"/></Style>
+  <Style x:Key="Caption" TargetType="TextBlock"><Setter Property="Foreground" Value="#95A6BC"/><Setter Property="Margin" Value="0,16,0,7"/></Style>
+  <Style TargetType="TabItem"><Setter Property="Padding" Value="20,10"/><Setter Property="Foreground" Value="#172332"/><Setter Property="FontWeight" Value="SemiBold"/></Style>
+ </Window.Resources>
+ <Grid Margin="26">
+  <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+  <Grid Margin="0,0,0,22"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+   <StackPanel><TextBlock Text="BUILDER VILLAGER" Foreground="#6FE3B7" FontSize="11" FontWeight="Bold"/><TextBlock Text="服务器管理面板" FontSize="27" FontWeight="SemiBold" Margin="0,5,0,5"/><TextBlock x:Name="ServerPath" Foreground="#8B9AB0" FontSize="11"/></StackPanel>
+   <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button x:Name="OpenFolder" Content="服务器目录"/><Button x:Name="StartAll" Content="启动全部" Background="#63D9AC" Foreground="#10231C" Margin="0"/></StackPanel>
+  </Grid>
+  <Grid Grid.Row="1" Margin="0,0,0,22"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="16"/><ColumnDefinition/></Grid.ColumnDefinitions>
+   <Border Background="{StaticResource Card}" CornerRadius="10" Padding="20"><StackPanel>
+    <Grid><TextBlock Text="PAPER  /  游戏服务" Foreground="#AEBBD0"/><TextBlock x:Name="PaperState" Text="检测中" HorizontalAlignment="Right" Foreground="#6FE3B7" FontWeight="Bold"/></Grid>
+    <TextBlock x:Name="PaperMetric" Text="—" FontSize="24" Margin="0,14,0,5"/><TextBlock x:Name="PaperDetail" Text="正在读取服务状态…" Foreground="#879BB5" FontSize="11"/>
+    <StackPanel Orientation="Horizontal" Margin="0,17,0,0"><Button x:Name="StartPaper" Content="启动"/><Button x:Name="StopPaper" Content="正常停止"/><Button x:Name="PaperLogs" Content="查看日志" Background="#222F40"/></StackPanel>
+   </StackPanel></Border>
+   <Border Grid.Column="2" Background="{StaticResource Card}" CornerRadius="10" Padding="20"><StackPanel>
+    <Grid><TextBlock Text="MCP  /  建筑服务" Foreground="#AEBBD0"/><TextBlock x:Name="McpState" Text="检测中" HorizontalAlignment="Right" Foreground="#6FE3B7" FontWeight="Bold"/></Grid>
+    <TextBlock x:Name="McpMetric" Text="—" FontSize="24" Margin="0,14,0,5"/><TextBlock x:Name="McpDetail" Text="正在读取服务状态…" Foreground="#879BB5" FontSize="11"/>
+    <StackPanel Orientation="Horizontal" Margin="0,17,0,0"><Button x:Name="StartMcp" Content="启动"/><Button x:Name="StopMcp" Content="正常停止"/><Button x:Name="McpLogs" Content="查看日志" Background="#222F40"/></StackPanel>
+   </StackPanel></Border>
+  </Grid>
+  <TabControl x:Name="Tabs" Grid.Row="2" Background="#1B2431" BorderThickness="0" Padding="18">
+   <TabItem Header="服务器配置"><ScrollViewer VerticalScrollBarVisibility="Auto"><Grid Margin="4,0,14,16"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="28"/><ColumnDefinition/></Grid.ColumnDefinitions>
+    <StackPanel><TextBlock Text="基础设置" FontSize="17" FontWeight="SemiBold" Margin="0,4,0,0"/>
+     <TextBlock Text="服务器描述 MOTD" Style="{StaticResource Caption}"/><TextBox x:Name="Motd"/>
+     <TextBlock Text="游戏端口" Style="{StaticResource Caption}"/><TextBox x:Name="PaperPort"/>
+     <TextBlock Text="最大玩家数" Style="{StaticResource Caption}"/><TextBox x:Name="MaxPlayers"/>
+     <TextBlock Text="游戏模式" Style="{StaticResource Caption}"/><ComboBox x:Name="Gamemode"><ComboBoxItem Content="生存" Tag="survival"/><ComboBoxItem Content="创造" Tag="creative"/><ComboBoxItem Content="冒险" Tag="adventure"/><ComboBoxItem Content="旁观" Tag="spectator"/></ComboBox>
+     <TextBlock Text="难度" Style="{StaticResource Caption}"/><ComboBox x:Name="Difficulty"><ComboBoxItem Content="和平" Tag="peaceful"/><ComboBoxItem Content="简单" Tag="easy"/><ComboBoxItem Content="普通" Tag="normal"/><ComboBoxItem Content="困难" Tag="hard"/></ComboBox>
+     <WrapPanel Margin="0,9,0,0"><CheckBox x:Name="OnlineMode" Content="正版验证"/><CheckBox x:Name="Whitelist" Content="启用白名单"/></WrapPanel>
+    </StackPanel>
+    <StackPanel Grid.Column="2"><TextBlock Text="性能与规则" FontSize="17" FontWeight="SemiBold" Margin="0,4,0,0"/>
+     <TextBlock Text="最小内存（GB）" Style="{StaticResource Caption}"/><TextBox x:Name="MinMemory"/>
+     <TextBlock Text="最大内存（GB）" Style="{StaticResource Caption}"/><TextBox x:Name="MaxMemory"/>
+     <TextBlock Text="视距（区块）" Style="{StaticResource Caption}"/><TextBox x:Name="ViewDistance"/>
+     <TextBlock Text="模拟距离（区块）" Style="{StaticResource Caption}"/><TextBox x:Name="SimulationDistance"/>
+     <WrapPanel Margin="0,18,0,0"><CheckBox x:Name="Pvp" Content="允许 PVP"/><CheckBox x:Name="AllowFlight" Content="允许飞行"/></WrapPanel>
+     <TextBlock Text="配置保存前自动备份。正在运行的服务器需要重启后使用新配置。" TextWrapping="Wrap" Foreground="#8295AC" Margin="0,18,0,0" LineHeight="22"/>
+    </StackPanel>
+   </Grid></ScrollViewer></TabItem>
+   <TabItem Header="MCP 与 Agent"><ScrollViewer VerticalScrollBarVisibility="Auto"><Grid Margin="4,0,14,16"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="28"/><ColumnDefinition/></Grid.ColumnDefinitions>
+    <StackPanel><TextBlock Text="连接设置" FontSize="17" FontWeight="SemiBold" Margin="0,4,0,0"/>
+     <TextBlock Text="MCP 端口" Style="{StaticResource Caption}"/><TextBox x:Name="McpPort"/>
+     <TextBlock Text="Paper 内部桥接端口" Style="{StaticResource Caption}"/><TextBox x:Name="BridgePort"/>
+     <TextBlock Text="修改端口时会同步更新 Paper 侧配置，保留现有共享密钥。" TextWrapping="Wrap" Foreground="#8295AC" Margin="0,18,0,0" LineHeight="22"/>
+    </StackPanel>
+    <StackPanel Grid.Column="2"><TextBlock Text="Agent 执行设置" FontSize="17" FontWeight="SemiBold" Margin="0,4,0,0"/>
+     <CheckBox x:Name="AgentEnabled" Content="启用服务端 Agent"/>
+     <TextBlock Text="后端" Style="{StaticResource Caption}"/><ComboBox x:Name="Backend"><ComboBoxItem Content="DeepSeek Harness" Tag="deepseek"/><ComboBoxItem Content="Codex" Tag="codex"/></ComboBox>
+     <TextBlock Text="CLI 可执行文件路径" Style="{StaticResource Caption}"/><TextBox x:Name="Executable"/>
+     <TextBlock Text="并行任务数（1–4）" Style="{StaticResource Caption}"/><TextBox x:Name="Concurrency"/>
+     <TextBlock Text="任务超时（秒）" Style="{StaticResource Caption}"/><TextBox x:Name="Timeout"/>
+    </StackPanel>
+   </Grid></ScrollViewer></TabItem>
+   <TabItem Header="运行日志"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/></Grid.RowDefinitions><StackPanel Orientation="Horizontal" Margin="0,0,0,12"><Button x:Name="SelectPaperLog" Content="Paper 日志"/><Button x:Name="SelectMcpLog" Content="MCP 日志"/><Button x:Name="RefreshLog" Content="刷新日志"/></StackPanel><TextBox Grid.Row="1" x:Name="LogText" IsReadOnly="True" FontFamily="Consolas" FontSize="12" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/></Grid></TabItem>
+  </TabControl>
+  <Grid Grid.Row="3" Margin="0,20,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel VerticalAlignment="Center"><TextBlock x:Name="Notice" Text="配置已载入" Foreground="#A3B4C9"/><TextBlock x:Name="UpdatedAt" Foreground="#677F9B" FontSize="10" Margin="0,5,0,0"/></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="Reload" Content="重新载入"/><Button x:Name="Save" Content="保存配置" Background="#63D9AC" Foreground="#10231C" Margin="0"/></StackPanel></Grid>
+ </Grid>
+</Window>

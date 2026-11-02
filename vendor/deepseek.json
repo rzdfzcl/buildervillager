@@ -1,0 +1,13 @@
+{
+  "kind": "deepseek",
+  "format": 2,
+  "platform": "win32",
+  "arch": "x64",
+  "name": "buildervillager-deepseek-runtime-0.2.1-rc.5.tgz",
+  "version": "0.2.1-rc.5",
+  "file": "downloads/buildervillager-deepseek-runtime-0.2.1-rc.5.tgz",
+  "algorithm": "sha256",
+  "checksum": "cdac69e82e5a85b700912cc6e52051969cec15eb1b86cd2a22d7e7cb456c08da",
+  "url": "https://registry.npmjs.org/@deepseek-ai/dsh",
+  "size": 179170714
+}

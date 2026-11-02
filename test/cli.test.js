@@ -93,6 +93,8 @@ async function main() {
 
   test('parseArgs 支持短参数与默认值', () => {
     const { parseArgs } = require(path.join(root, 'lib/cli'));
+    assert.strictEqual(parseArgs([]).interactive, false, '默认下载后直接安装，不显示组件菜单');
+    assert.strictEqual(parseArgs(['--interactive']).interactive, true);
     const options = parseArgs(['-d', '.', '-m', '26.3', '--backend', 'codex', '--timeout', '60']);
     assert.strictEqual(options.minecraft, '26.3');
     assert.strictEqual(options.backend, 'codex');
@@ -185,9 +187,22 @@ async function main() {
   });
 
   test('resolvePaper 取最新 STABLE，resolveModrinth 取最新 release', async () => {
-    // 这些函数直连官方地址，因此这里只验证它们在空版本时给出可读错误。
-    const resolve = require(path.join(root, 'lib/resolve'));
-    await assert.rejects(resolve.resolvePaper('0000.0'), /没有可用构建|HTTP|网络|请求/);
+    const util = require('../lib/util');
+    const original = util.fetchJson;
+    const modulePath = require.resolve('../lib/resolve');
+    const cached = require.cache[modulePath];
+    util.fetchJson = (url) => original(url.replace('https://fill.papermc.io/v3/projects/paper', `${base}/paper`)
+      .replace('https://api.modrinth.com/v2', `${base}/modrinth`));
+    delete require.cache[modulePath];
+    try {
+      const resolver = require('../lib/resolve');
+      assert.strictEqual((await resolver.resolvePaper('26.3')).build, 237);
+      assert.strictEqual((await resolver.resolveModrinth('worldedit', '26.3')).version, '7.4.6');
+      await assert.rejects(resolver.resolvePaper('9.9'), /没有可用构建/);
+    } finally {
+      util.fetchJson = original;
+      require.cache[modulePath] = cached;
+    }
   });
 
   let failed = 0;
