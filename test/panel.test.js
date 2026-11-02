@@ -18,7 +18,7 @@ test('面板保存、备份、端口联动与外部修改冲突保护', { skip: 
   const core = path.join(__dirname, '../panel/core.ps1').replaceAll("'", "''");
   const script = String.raw`
 $ErrorActionPreference='Stop'
-. '${core}'
+. ([scriptblock]::Create([IO.File]::ReadAllText('${core}',[Text.Encoding]::UTF8)))
 $root=$PSScriptRoot
 $old=Get-PanelConfiguration $root
 $writer=[IO.FileStream]::new((Join-Path $root 'server.properties'),[IO.FileMode]::Open,[IO.FileAccess]::ReadWrite,[IO.FileShare]::ReadWrite)
@@ -44,6 +44,20 @@ $inputValues.mcpPort=25590
 $badRejected=$false
 try { Save-PanelConfiguration $root $inputValues $revision } catch { $badRejected=$true }
 if (!$badRejected -or (Get-PanelRevision $root) -ne $revision) { throw 'Invalid port configuration was written' }
+New-Item -ItemType Directory -Path (Join-Path $root 'world'),(Join-Path $root '第二世界'),(Join-Path $root 'world_nether') | Out-Null
+foreach($world in @('world','第二世界','world_nether')) { [IO.File]::WriteAllText((Join-Path $root ($world+'/level.dat')),'fixture') }
+$worlds=Get-PanelWorlds $root
+if (@($worlds.Worlds).Count -ne 2) { throw 'Dimension folders must not be treated as independent worlds' }
+Set-PanelWorld $root '第二世界'
+if ((Get-PanelWorlds $root).Current -ne '第二世界') { throw 'World switch did not round trip Unicode' }
+foreach($bad in @('../escape','mcp','')) {
+ $rejected=$false; try { Assert-PanelWorldSelection $root $bad $false '' } catch { $rejected=$true }
+ if (!$rejected) { throw 'Unsafe world selection accepted' }
+}
+$before=Get-PanelRevision $root
+function Get-PanelProcesses { param($Root); return @{paper=@([pscustomobject]@{ProcessId=1});mcp=@()} }
+$runningRejected=$false;try{Set-PanelWorld $root 'world'}catch{$runningRejected=$true}
+if (!$runningRejected -or (Get-PanelRevision $root) -ne $before) {throw 'World configuration changed before Paper stopped'}
 Write-Output 'PANEL_SAVE_TEST_OK'
 `;
   const file = path.join(directory, 'test.ps1'); fs.writeFileSync(file, '\ufeff'+script);

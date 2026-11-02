@@ -67,7 +67,7 @@ test('一键启动执行两个服务入口，首次在脚本内确认 EULA', { s
   assert.equal(started.length, 2);
   assert.ok(started[0].args.includes('start-paper.cmd'));
   assert.ok(started[1].args.includes('mcp\\start.cmd') || started[1].args.includes('mcp/start.cmd'));
-  assert.ok(started.every((entry) => entry.cwd === directory));
+  assert.ok(started.every((entry) => fs.realpathSync.native(entry.cwd).toLowerCase() === fs.realpathSync.native(directory).toLowerCase()));
   assert.ok(started.every((entry) => entry.style === 'Hidden'));
   assert.ok(fs.existsSync(path.join(directory, 'paper-started.txt')));
   assert.ok(fs.existsSync(path.join(directory, 'mcp/mcp-started.txt')));

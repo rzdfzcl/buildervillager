@@ -16,7 +16,7 @@ function Get-InstallerHash([string]$File,[string]$Algorithm) {
   finally { $stream.Dispose(); $hasher.Dispose() }
 }
 try {
-  $version = '0.1.4'
+  $version = '0.1.5'
   $base = Split-Path -Parent $env:BV_INSTALL_SELF
   $node = Get-Command node -ErrorAction SilentlyContinue
   if (!$node) { throw 'Node.js 22.16+ is required to run this installer.' }

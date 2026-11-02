@@ -96,7 +96,7 @@ buildervillager-server/
 
 ## 启动
 
-**双击服务目录的 `panel.cmd` 打开管理面板**，点击“启动全部”即可在后台启动 Paper 和 MCP，不弹服务控制台。面板显示每个服务的状态、PID、内存和端口，支持正常停止、查看日志，以及编辑游戏和 MCP/Agent 配置。配置修改会自动备份，并同步相关端口；需要重启对应服务后生效。
+**双击服务目录的 `panel.cmd` 打开管理面板**，点击“启动全部”即可在后台启动 Paper 和 MCP，不弹服务控制台。面板显示每个服务的状态、PID、内存和端口，支持正常停止、重启单项或全部服务、查看日志，以及编辑游戏和 MCP/Agent 配置。世界管理可切换已有世界或创建新世界；玩家管理可查看在线及历史角色，授予／取消 OP、切换游戏模式、给予经验、恢复生命，以及按中文名或物品 ID 搜索并给予物品。配置修改会自动备份，并同步相关端口；需要重启对应服务后生效。
 
 面板首次启动服务时会在面板内确认 Minecraft EULA，已经同意后不再询问。也可使用 `start.cmd` 后台启动两个服务；未同意 EULA 时该脚本会询问一次。
 
@@ -104,7 +104,9 @@ buildervillager-server/
 buildervillager-server\start.cmd
 ```
 
-然后进入游戏：`模组 → AI Builder Villager → 配置 → 建筑 MCP → 绑定当前玩家 → 测试 MCP`。
+MCP 使用服务凭据连接，可从面板复制 MCP 地址和凭据。服务凭据保存在 `mcp/secret.txt`，外部 MCP 客户端使用 `Authorization: Bearer <凭据>`；玩家只作为管理操作目标。
+
+游戏客户端会自动连接。进入游戏：`模组 → AI Builder Villager → 配置 → 建筑 MCP → 测试 MCP`。
 
 ## 环境要求
 

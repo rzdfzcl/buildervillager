@@ -12,18 +12,18 @@
   <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
   <Grid Margin="0,0,0,22"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
    <StackPanel><TextBlock Text="BUILDER VILLAGER" Foreground="#6FE3B7" FontSize="11" FontWeight="Bold"/><TextBlock Text="服务器管理面板" FontSize="27" FontWeight="SemiBold" Margin="0,5,0,5"/><TextBlock x:Name="ServerPath" Foreground="#8B9AB0" FontSize="11"/></StackPanel>
-   <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button x:Name="OpenFolder" Content="服务器目录"/><Button x:Name="StartAll" Content="启动全部" Background="#63D9AC" Foreground="#10231C" Margin="0"/></StackPanel>
+   <StackPanel Grid.Column="1" Orientation="Horizontal" VerticalAlignment="Center"><Button x:Name="OpenFolder" Content="服务器目录"/><Button x:Name="RestartAll" Content="重启全部"/><Button x:Name="StartAll" Content="启动全部" Background="#63D9AC" Foreground="#10231C" Margin="0"/></StackPanel>
   </Grid>
   <Grid Grid.Row="1" Margin="0,0,0,22"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="16"/><ColumnDefinition/></Grid.ColumnDefinitions>
    <Border Background="{StaticResource Card}" CornerRadius="10" Padding="20"><StackPanel>
     <Grid><TextBlock Text="PAPER  /  游戏服务" Foreground="#AEBBD0"/><TextBlock x:Name="PaperState" Text="检测中" HorizontalAlignment="Right" Foreground="#6FE3B7" FontWeight="Bold"/></Grid>
     <TextBlock x:Name="PaperMetric" Text="—" FontSize="24" Margin="0,14,0,5"/><TextBlock x:Name="PaperDetail" Text="正在读取服务状态…" Foreground="#879BB5" FontSize="11"/>
-    <StackPanel Orientation="Horizontal" Margin="0,17,0,0"><Button x:Name="StartPaper" Content="启动"/><Button x:Name="StopPaper" Content="正常停止"/><Button x:Name="PaperLogs" Content="查看日志" Background="#222F40"/></StackPanel>
+    <StackPanel Orientation="Horizontal" Margin="0,17,0,0"><Button x:Name="StartPaper" Content="启动"/><Button x:Name="RestartPaper" Content="重启"/><Button x:Name="StopPaper" Content="正常停止"/><Button x:Name="PaperLogs" Content="查看日志" Background="#222F40"/></StackPanel>
    </StackPanel></Border>
    <Border Grid.Column="2" Background="{StaticResource Card}" CornerRadius="10" Padding="20"><StackPanel>
     <Grid><TextBlock Text="MCP  /  建筑服务" Foreground="#AEBBD0"/><TextBlock x:Name="McpState" Text="检测中" HorizontalAlignment="Right" Foreground="#6FE3B7" FontWeight="Bold"/></Grid>
     <TextBlock x:Name="McpMetric" Text="—" FontSize="24" Margin="0,14,0,5"/><TextBlock x:Name="McpDetail" Text="正在读取服务状态…" Foreground="#879BB5" FontSize="11"/>
-    <StackPanel Orientation="Horizontal" Margin="0,17,0,0"><Button x:Name="StartMcp" Content="启动"/><Button x:Name="StopMcp" Content="正常停止"/><Button x:Name="McpLogs" Content="查看日志" Background="#222F40"/></StackPanel>
+    <StackPanel Orientation="Horizontal" Margin="0,17,0,0"><Button x:Name="StartMcp" Content="启动"/><Button x:Name="RestartMcp" Content="重启"/><Button x:Name="StopMcp" Content="正常停止"/><Button x:Name="McpLogs" Content="查看日志" Background="#222F40"/></StackPanel>
    </StackPanel></Border>
   </Grid>
   <TabControl x:Name="Tabs" Grid.Row="2" Background="#1B2431" BorderThickness="0" Padding="18">
@@ -49,6 +49,8 @@
     <StackPanel><TextBlock Text="连接设置" FontSize="17" FontWeight="SemiBold" Margin="0,4,0,0"/>
      <TextBlock Text="MCP 端口" Style="{StaticResource Caption}"/><TextBox x:Name="McpPort"/>
      <TextBlock Text="Paper 内部桥接端口" Style="{StaticResource Caption}"/><TextBox x:Name="BridgePort"/>
+     <WrapPanel Margin="0,18,0,0"><Button x:Name="CopyMcpAddress" Content="复制 MCP 地址"/><Button x:Name="CopyMcpCredential" Content="复制服务凭据"/></WrapPanel>
+     <TextBlock Text="MCP 使用服务凭据连接。玩家只作为操作目标。" TextWrapping="Wrap" Foreground="#8295AC" Margin="0,10,0,0" LineHeight="22"/>
      <TextBlock Text="修改端口时会同步更新 Paper 侧配置，保留现有共享密钥。" TextWrapping="Wrap" Foreground="#8295AC" Margin="0,18,0,0" LineHeight="22"/>
     </StackPanel>
     <StackPanel Grid.Column="2"><TextBlock Text="Agent 执行设置" FontSize="17" FontWeight="SemiBold" Margin="0,4,0,0"/>
@@ -59,8 +61,32 @@
      <TextBlock Text="任务超时（秒）" Style="{StaticResource Caption}"/><TextBox x:Name="Timeout"/>
     </StackPanel>
    </Grid></ScrollViewer></TabItem>
+   <TabItem Header="世界管理"><ScrollViewer VerticalScrollBarVisibility="Auto"><StackPanel Margin="5,5,20,20">
+    <TextBlock Text="当前配置的世界" Foreground="#95A6BC"/><TextBlock x:Name="CurrentWorld" FontSize="24" Margin="0,5,0,20"/>
+    <TextBlock Text="切换已有世界" FontSize="17" FontWeight="SemiBold"/><Grid Margin="0,12,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><ComboBox x:Name="WorldList"/><Button Grid.Column="1" x:Name="SwitchWorld" Content="切换并重启 Paper" Margin="12,0,0,0"/></Grid>
+    <TextBlock Text="创建新世界" FontSize="17" FontWeight="SemiBold" Margin="0,30,0,0"/><TextBlock Text="世界文件夹名称" Style="{StaticResource Caption}"/><TextBox x:Name="NewWorldName"/>
+    <TextBlock Text="世界种子（留空随机）" Style="{StaticResource Caption}"/><TextBox x:Name="NewWorldSeed"/><Button x:Name="CreateWorld" Content="创建并切换" HorizontalAlignment="Left" Margin="0,16,0,0"/>
+    <TextBlock Text="切换时会先正常保存并关闭 Paper，再切换世界并重新启动。已有世界文件保留，可随时切回。" Foreground="#8295AC" TextWrapping="Wrap" Margin="0,22,0,0" LineHeight="23"/>
+   </StackPanel></ScrollViewer></TabItem>
+   <TabItem Header="玩家管理"><Grid Margin="0,5,0,0"><Grid.ColumnDefinitions><ColumnDefinition Width="0.95*"/><ColumnDefinition Width="20"/><ColumnDefinition Width="1.05*"/></Grid.ColumnDefinitions>
+    <Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/></Grid.RowDefinitions><StackPanel Orientation="Horizontal" Margin="0,0,0,10"><Button x:Name="RefreshPlayers" Content="刷新玩家"/><TextBlock Text="在线 / 历史玩家" VerticalAlignment="Center" Foreground="#8295AC"/></StackPanel>
+     <DataGrid x:Name="Players" Grid.Row="1" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" CanUserAddRows="False" Background="#111B27" Foreground="#1A2C3B" RowBackground="#DFE7F0" AlternatingRowBackground="#CCD9E7" GridLinesVisibility="None" HeadersVisibility="Column" RowHeight="30">
+      <DataGrid.Columns><DataGridTextColumn Header="玩家" Binding="{Binding Name}" Width="*"/><DataGridTextColumn Header="状态" Binding="{Binding OnlineText}" Width="65"/><DataGridTextColumn Header="OP" Binding="{Binding OpText}" Width="48"/><DataGridTextColumn Header="等级" Binding="{Binding Level}" Width="48"/></DataGrid.Columns>
+     </DataGrid>
+    </Grid>
+    <ScrollViewer Grid.Column="2" VerticalScrollBarVisibility="Auto"><StackPanel Margin="0,0,10,15">
+     <TextBlock x:Name="SelectedPlayer" Text="请先选择玩家" FontSize="17" FontWeight="SemiBold" Margin="0,0,0,12"/>
+     <WrapPanel><Button x:Name="GrantOp" Content="授予 OP"/><Button x:Name="RevokeOp" Content="取消 OP"/><Button x:Name="HealPlayer" Content="恢复 HP / 饱食度"/></WrapPanel>
+     <TextBlock Text="游戏模式" Style="{StaticResource Caption}"/><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><ComboBox x:Name="PlayerMode"><ComboBoxItem Content="生存" Tag="survival"/><ComboBoxItem Content="创造" Tag="creative"/><ComboBoxItem Content="冒险" Tag="adventure"/><ComboBoxItem Content="旁观" Tag="spectator"/></ComboBox><Button Grid.Column="1" x:Name="SetPlayerMode" Content="应用" Margin="8,0,0,0"/></Grid>
+     <TextBlock Text="给予经验" Style="{StaticResource Caption}"/><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="105"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBox x:Name="ExperienceAmount" Text="100"/><ComboBox Grid.Column="1" x:Name="ExperienceUnit" Margin="8,0,0,0"><ComboBoxItem Content="经验值" Tag="points"/><ComboBoxItem Content="经验等级" Tag="levels"/></ComboBox><Button Grid.Column="2" x:Name="GiveExperience" Content="给予" Margin="8,0,0,0"/></Grid>
+     <TextBlock Text="给予物品 · 支持中文名称 / 物品 ID 搜索" Style="{StaticResource Caption}"/><Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBox x:Name="ItemQuery"/><Button Grid.Column="1" x:Name="SearchItems" Content="搜索" Margin="8,0,0,0"/></Grid>
+     <DataGrid x:Name="Items" Margin="0,10,0,10" Height="160" AutoGenerateColumns="False" IsReadOnly="True" SelectionMode="Single" CanUserAddRows="False" Background="#111B27" Foreground="#1A2C3B" RowBackground="#DFE7F0" AlternatingRowBackground="#CCD9E7" GridLinesVisibility="None" HeadersVisibility="Column" RowHeight="28"><DataGrid.Columns><DataGridTextColumn Header="物品" Binding="{Binding name}" Width="*"/><DataGridTextColumn Header="ID" Binding="{Binding id}" Width="*"/></DataGrid.Columns></DataGrid>
+     <Grid><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><TextBox x:Name="ItemAmount" Text="1"/><Button Grid.Column="1" x:Name="GiveItem" Content="给予所选物品" Margin="8,0,0,0"/></Grid>
+     <TextBlock Text="游戏模式、经验、恢复生命和给予物品需要玩家在线。背包放不下的物品会掉落在玩家身边。" TextWrapping="Wrap" Foreground="#8295AC" Margin="0,18,0,0" LineHeight="21"/>
+    </StackPanel></ScrollViewer>
+   </Grid></TabItem>
    <TabItem Header="运行日志"><Grid><Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition/></Grid.RowDefinitions><StackPanel Orientation="Horizontal" Margin="0,0,0,12"><Button x:Name="SelectPaperLog" Content="Paper 日志"/><Button x:Name="SelectMcpLog" Content="MCP 日志"/><Button x:Name="RefreshLog" Content="刷新日志"/></StackPanel><TextBox Grid.Row="1" x:Name="LogText" IsReadOnly="True" FontFamily="Consolas" FontSize="12" TextWrapping="NoWrap" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"/></Grid></TabItem>
   </TabControl>
-  <Grid Grid.Row="3" Margin="0,20,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel VerticalAlignment="Center"><TextBlock x:Name="Notice" Text="配置已载入" Foreground="#A3B4C9"/><TextBlock x:Name="UpdatedAt" Foreground="#677F9B" FontSize="10" Margin="0,5,0,0"/></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="Reload" Content="重新载入"/><Button x:Name="Save" Content="保存配置" Background="#63D9AC" Foreground="#10231C" Margin="0"/></StackPanel></Grid>
+  <Grid Grid.Row="3" Margin="0,20,0,0"><Grid.ColumnDefinitions><ColumnDefinition/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions><StackPanel VerticalAlignment="Center"><TextBlock x:Name="Notice" Text="配置已载入" Foreground="#A3B4C9" TextWrapping="Wrap" Margin="0,0,16,0"/><TextBlock x:Name="UpdatedAt" Foreground="#677F9B" FontSize="10" Margin="0,5,0,0"/></StackPanel><StackPanel Grid.Column="1" Orientation="Horizontal"><Button x:Name="Reload" Content="重新载入"/><Button x:Name="SaveRestart" Content="保存并重启"/><Button x:Name="Save" Content="保存配置" Background="#63D9AC" Foreground="#10231C" Margin="0"/></StackPanel></Grid>
  </Grid>
 </Window>

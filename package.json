@@ -1,6 +1,6 @@
 {
   "name": "@rzdfzcl/buildervillager",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "一条命令检查/部署/更新 Minecraft Paper 26.3 服务端、BuilderVillager MCP 服务与 Agent 技能",
   "keywords": [
     "minecraft",

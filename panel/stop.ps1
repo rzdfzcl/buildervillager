@@ -1,7 +1,9 @@
 param([Parameter(Mandatory=$true)][string]$ServerDirectory,[ValidateSet('paper','mcp')][string]$Kind)
 $ErrorActionPreference='Stop'
+$ServerDirectory=[IO.Path]::GetFullPath($ServerDirectory).TrimEnd('\','/')
 . (Join-Path $PSScriptRoot 'core.ps1')
 try {
+  try { $null=Invoke-PanelAdmin $ServerDirectory @{action='shutdown'} $Kind; exit 0 } catch { }
   $processes = Get-PanelProcesses $ServerDirectory
   $targets = @($processes[$Kind])
   if ($targets.Count -ne 1) { throw 'Cannot identify exactly one service process.' }

@@ -17,6 +17,7 @@ test('独立安装脚本在 npm 不可用时从 GitHub 下载并校验后自动�
   const tar=path.join(process.env.SystemRoot,'System32/tar.exe');
   assert.equal(spawnSync(tar,['-czf',archive,'-C',source,'package'],{windowsHide:true}).status,0);
   const hash=crypto.createHash('sha256').update(fs.readFileSync(archive)).digest('hex');
+  const version=require('../package.json').version;
   const installer=path.join(target,'install.cmd');fs.copyFileSync(path.join(__dirname,'../install.cmd'),installer);
   const escape=(value)=>value.replaceAll("'","''");
   const script=String.raw`
@@ -25,8 +26,8 @@ $env:BV_INSTALL_SELF='${escape(installer)}'
 $env:BV_TEST_RESULT='${escape(path.join(root,'result.json'))}'
 function Invoke-RestMethod { param($Uri,$TimeoutSec); throw 'npm unavailable in test' }
 function Invoke-WebRequest { param([switch]$UseBasicParsing,$Uri,$OutFile)
- if ([string]$Uri -like '*/SHA256SUMS.txt') { return @{Content='${hash}  rzdfzcl-buildervillager-0.1.4.tgz'} }
- if ([string]$Uri -notlike 'https://github.com/rzdfzcl/buildervillager/releases/download/v0.1.4/*.tgz') { throw 'Unexpected download source' }
+ if ([string]$Uri -like '*/SHA256SUMS.txt') { return @{Content='${hash}  rzdfzcl-buildervillager-${version}.tgz'} }
+ if ([string]$Uri -notlike 'https://github.com/rzdfzcl/buildervillager/releases/download/v${version}/*.tgz') { throw 'Unexpected download source' }
  Copy-Item -LiteralPath '${escape(archive)}' -Destination $OutFile
 }
 $lines=Get-Content -LiteralPath $env:BV_INSTALL_SELF

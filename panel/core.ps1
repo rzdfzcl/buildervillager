@@ -169,3 +169,56 @@ function Test-PanelPort([int]$Port) {
   $client = New-Object Net.Sockets.TcpClient
   try { $pending=$client.BeginConnect('127.0.0.1',$Port,$null,$null); if (!$pending.AsyncWaitHandle.WaitOne(120)) { return $false }; $client.EndConnect($pending); return $true } catch { return $false } finally { $client.Dispose() }
 }
+function Invoke-PanelAdmin([string]$Root,$Payload,[string]$Kind='paper') {
+  $settings=Read-PanelJson (Join-Path $Root 'mcp/mcp.json')
+  $uri=[uri]$settings.bridgeUrl
+  if ($Kind -eq 'mcp') { $uri=[uri]('http://127.0.0.1:'+([int]$settings.port)+'/panel/stop') }
+  else { $uri=[uri]($uri.GetLeftPart([UriPartial]::Authority)+'/bridge/panel') }
+  if ($uri.Scheme -ne 'http' -or $uri.Host -notin @('127.0.0.1','localhost','[::1]','::1')) { throw '管理接口必须是本机回环地址。' }
+  $secret=(Read-PanelText (Join-Path $Root 'mcp/secret.txt')).Trim()
+  $request=[Net.HttpWebRequest]::Create($uri); $request.Proxy=$null
+  $request.Method='POST'; $request.ContentType='application/json; charset=utf-8'; $request.Timeout=6000; $request.ReadWriteTimeout=6000
+  $request.Headers['X-Builder-Bridge-Key']=$secret
+  $bytes=[Text.Encoding]::UTF8.GetBytes(($Payload | ConvertTo-Json -Compress -Depth 12))
+  $request.ContentLength=$bytes.Length
+  $stream=$request.GetRequestStream(); try { $stream.Write($bytes,0,$bytes.Length) } finally { $stream.Dispose() }
+  try { $response=$request.GetResponse() }
+  catch [Net.WebException] {
+    $failed=$_.Exception.Response
+    if ($failed) { $reader=[IO.StreamReader]::new($failed.GetResponseStream(),[Text.Encoding]::UTF8); try { $errorBody=$reader.ReadToEnd() | ConvertFrom-Json; if ($errorBody.error) { throw [string]$errorBody.error } } finally { $reader.Dispose(); $failed.Dispose() } }
+    throw '管理接口暂不可用，请确认 Paper 已启动且插件已更新。'
+  }
+  try { $reader=[IO.StreamReader]::new($response.GetResponseStream(),[Text.Encoding]::UTF8); try { $body=$reader.ReadToEnd() | ConvertFrom-Json } finally { $reader.Dispose() } } finally { $response.Dispose() }
+  if ($body.error) { throw [string]$body.error }
+  return $body.result
+}
+function Get-PanelWorlds([string]$Root) {
+  $current=(Read-ServerProperties $Root)['level-name']; if (!$current) { $current='world' }
+  $current=[regex]::Replace($current,'\\u([a-fA-F0-9]{4})',{param($m) [string][char][Convert]::ToInt32($m.Groups[1].Value,16)})
+  $worlds=@(Get-ChildItem -LiteralPath $Root -Directory | Where-Object { Test-Path -LiteralPath (Join-Path $_.FullName 'level.dat') } | Where-Object { !($_.Name -match '(_nether|_the_end)$' -and (Test-Path -LiteralPath (Join-Path $Root ($_.Name -replace '(_nether|_the_end)$','')))) } | ForEach-Object { [pscustomobject]@{Name=$_.Name;IsCurrent=($_.Name -eq $current);Path=$_.FullName} })
+  return [pscustomobject]@{Current=$current;Worlds=$worlds}
+}
+function Assert-PanelWorldSelection([string]$Root,[string]$Name,[bool]$Create=$false,[string]$Seed='') {
+  if ([string]::IsNullOrWhiteSpace($Name) -or $Name -match '[\\/:*?"<>|\r\n\x00]' -or $Name -in @('.','..') -or $Name.EndsWith('.') -or $Name.EndsWith(' ')) { throw '世界名称只能是服务器目录内的一个普通文件夹名称。' }
+  $destination=[IO.Path]::GetFullPath((Join-Path $Root $Name))
+  if (![string]::Equals([IO.Path]::GetDirectoryName($destination),[IO.Path]::GetFullPath($Root).TrimEnd('\','/'),[StringComparison]::OrdinalIgnoreCase)) { throw '世界目录越界。' }
+  if ($Create) { if (Test-Path -LiteralPath $destination) { throw '该目录已经存在，请选择已有世界。' } }
+  elseif (!(Test-Path -LiteralPath (Join-Path $destination 'level.dat'))) { throw '选中的目录不是已有世界。' }
+  if ($Seed -match '[\r\n\x00]') { throw '世界种子不能包含换行。' }
+}
+function Set-PanelWorld([string]$Root,[string]$Name,[bool]$Create=$false,[string]$Seed='') {
+  Assert-PanelWorldSelection $Root $Name $Create $Seed
+  if (@((Get-PanelProcesses $Root).paper).Count -gt 0) { throw '请先正常停止 Paper，再切换世界。' }
+  $escaped=-join @($Name.ToCharArray() | ForEach-Object { if([int]$_ -gt 126) {'\u{0:x4}' -f [int]$_} else {[string]$_} })
+  $changes=@{'level-name'=$escaped}; if($Create){$changes['level-seed']=$Seed}
+  $file=Join-Path $Root 'server.properties'; $seen=@{}
+  $lines=@(foreach($line in ((Read-PanelText $file) -split '\r?\n')) {
+    if($line -match '^\s*([^#!\s=]+)\s*=' -and $changes.ContainsKey($Matches[1])) { $key=$Matches[1];if(!$seen.ContainsKey($key)){"$key=$($changes[$key])";$seen[$key]=$true} } else {$line}
+  })
+  foreach($key in $changes.Keys){if(!$seen.ContainsKey($key)){$lines+="$key=$($changes[$key])"}}
+  $backup=Join-Path $Root ('config-backups/world-'+(Get-Date -Format 'yyyyMMdd-HHmmss-fff'))
+  New-Item -ItemType Directory -Force -Path $backup | Out-Null
+  Copy-Item -LiteralPath $file -Destination (Join-Path $backup 'server.properties')
+  Write-PanelAtomic $file ($lines -join "`r`n")
+  return $backup
+}
